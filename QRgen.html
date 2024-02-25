@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Metadata -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  
+  <!-- Title and Bootstrap CSS -->
+  <title>Coddle-QR</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <!-- Styling -->
+  <style>
+    /* Styles for the page */
+    body {
+      background-color: #1e1e1e;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+      color: #d9d9d9;
+      margin: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 30px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      color: #00b3b3;
+    }
+
+    h2, h3 {
+      color: #669999;
+      font-weight: 400;
+    }
+
+    h2:before {
+      content: " ";
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 80px;
+      height: 2px;
+      background-color: #00b3b3;
+      margin-left: -40px;
+    }
+
+    .container {
+      max-width: 100%;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      background-color: #333;
+    }
+
+    .qr-code {
+      max-width: 100%;
+      margin: 20px 0;
+      opacity: 0;
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    label {
+      font-size: 18px;
+      color: #669999;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      max-width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #333;
+      border-radius: 4px;
+      color: #d9d9d9;
+      background-color: #666;
+    }
+
+    button {
+      margin-top: 20px;
+      display: block;
+      width: 100%;
+      line-height: 2em;
+      background: #00b3b3;
+      border: 0;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 1.5em;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #008080;
+    }
+
+    /* Responsive design media queries */
+    @media (min-width: 576px) {
+      h1 {
+        font-size: 36px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 42px;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+    }
+
+    /* Styles for the download button */
+    .download-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #00b3b3;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .download-button:hover {
+      background-color: #008080;
+    }
+  </style>
+</head>
+<body>
+  <!-- Main content container -->
+  <div class="container">
+    <!-- Heading -->
+    <h1>QR Code Generator</h1>
+    
+    <!-- Default QR Code with the new redirect URL -->
+    <img src="https://chart.googleapis.com/chart?cht=qr&chl=https://coddle.tech&chs=160x160&chld=L|0" class="qr-code img-thumbnail img-responsive" />
+
+    <!-- Form for user input -->
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label" for="content"><h3>URL:</h3></label>
+        <input type="text" size="60" maxlength="50" class="form-control" id="content" placeholder="Paste your URL here" />
+      </div>
+      <div class="form-group">
+        <button type="button" class="center-block" id="generate">Generate</button>
+      </div>
+      <div class="form-group">
+        <!-- Download button for the QR Code -->
+        <button class="download-button" onclick="downloadQRCode()">Download</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Copyright and credits -->
+  <p class="info-copyright">
+    © 2024 Coddle. All rights reserved.</p>
+  <p class="info-credits">Made with ❤️ by <strong>Kalp</strong></p>
+
+  <!-- jQuery library -->
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+  <!-- JavaScript code for QR Code generation and download -->
+  <script>
+    function htmlEncode(value) {
+      return $('<div/>').text(value).html();
+    }
+
+    function downloadQRCode() {
+      const canvas = document.createElement('canvas');
+      const qrCodeImage = document.querySelector('.qr-code');
+      const context = canvas.getContext('2d');
+      canvas.width = qrCodeImage.width;
+      canvas.height = qrCodeImage.height;
+      context.drawImage(qrCodeImage, 0, 0);
+
+      const downloadLink = document.createElement('a');
+      downloadLink.href = canvas.toDataURL('image/png');
+      downloadLink.download = 'qrcode.png';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+
+    $(function () {
+      $('#generate').click(function () {
+        // Construct the QR code URL based on user input
+        let finalURL = 'https://chart.googleapis.com/chart?cht=qr&chl=' +
+          htmlEncode($('#content').val()) + '&chs=160x160&chld=L|0';
+
+        // Set the QR code source to the constructed URL
+        $('.qr-code').attr('src', finalURL);
+      });
+    });
+  </script>
+</body>
+</html>
